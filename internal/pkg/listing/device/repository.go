@@ -15,3 +15,19 @@ type Repository struct {
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{db}
 }
+
+// Read returns a list of devices or error from the
+// persistency layer
+func (r *Repository) Read(id int) ([]*Device, error) {
+	var args []interface{}
+
+	if id > 0 {
+		args = append(args, id)
+	}
+
+	devices := []*Device{}
+
+	err := r.db.Find(&devices, args...).Error
+
+	return devices, err
+}

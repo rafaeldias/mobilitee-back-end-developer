@@ -1,6 +1,7 @@
 package device
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 
@@ -13,13 +14,13 @@ func TestNewRepository(t *testing.T) {
 	if err != nil {
 		t.Errorf("got error while calling sqlmock.New(): %s, want nil", err.Error())
 	}
-	defer db.Close()
 
 	g, err := gorm.Open("mysql", db)
 	if err != nil {
 		t.Errorf("got error while calling gotm.Open(\"mysql\", %+v): %s, want nil",
 			db, err.Error())
 	}
+	defer g.Close()
 
 	repo := NewRepository(g)
 
@@ -28,7 +29,68 @@ func TestNewRepository(t *testing.T) {
 	}
 }
 
-func TesRepositoryRead(t *testing.T) {
+func TestRepositoryRead(t *testing.T) {
 	testCases := []struct {
-	}{}
+		id          int
+		wantQuery   string
+		wantDevices []*Device
+	}{
+		{0, "SELECT \\* FROM `devices`", []*Device{&Device{ID: 0}}},
+		{1, "SELECT \\* FROM `devices` WHERE \\(`devices`\\.`id` = 1\\)", []*Device{&Device{ID: 1}}},
+		{2, "SELECT \\* FROM `devices` WHERE \\(`devices`\\.`id` = 2\\)", []*Device{&Device{ID: 2}}},
+	}
+
+	for _, tc := range testCases {
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Errorf("got error while calling sqlmock.New(): %s, want nil",
+				err.Error())
+		}
+
+		g, err := gorm.Open("mysql", db)
+		if err != nil {
+			t.Errorf("got error while calling gotm.Open(\"mysql\", %+v): %s, want nil",
+				db, err.Error())
+		}
+
+		rows := sqlmock.NewRows([]string{"id"}).AddRow(tc.id)
+		mock.ExpectQuery(tc.wantQuery).WillReturnRows(rows)
+
+		repo := NewRepository(g)
+
+		devices, err := repo.Read(tc.id)
+		if err != nil {
+			t.Errorf("got error while calling repo.Read(%d): %s, want nil",
+				tc.id, err.Error())
+		}
+
+		if !reflect.DeepEqual(tc.wantDevices, devices) {
+			t.Errorf("got devices from repo.Read(%d): %+v, want: %+v", tc.id,
+				devices, tc.wantDevices)
+
+		}
+
+		g.Close()
+	}
+}
+
+func TestRepositoryReadError(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("got error while creating sqlmock: %s; want nil", err.Error())
+	}
+
+	g, err := gorm.Open("mysql", db)
+	if err != nil {
+		t.Fatalf("got error while creating gorm: %s; want nil", err.Error())
+	}
+
+	mock.ExpectQuery("SELECT").WillReturnError(errors.New("Testing Repository Error"))
+
+	repo := NewRepository(g)
+
+	_, err = repo.Read(0)
+	if err == nil {
+		t.Error("got error nil while calling repo.Read(0): nil; want not nil")
+	}
 }
