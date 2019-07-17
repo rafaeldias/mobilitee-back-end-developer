@@ -6,19 +6,14 @@ import (
 	"time"
 )
 
-// MaxDevicesExchangeNotExpired occurs when the limit
-// of devices has been reached and an exchange has not
-// expired yet.
-//type MaxDevicesExchangeNotExpired struct {
-//	expiresIn time.Duration
-//}
-//
-//func (e *MaxDevicesExchangeNotExpired) Error() {
-//	fmt.Sprintf(
-//		"devices limit exceeded and you cannot do an exchanging. You can exchange a device in %d days",
-//		e.expiresIn,
-//	)
-//}
+// InvalidError describes any error occurred by invalid input
+type InvalidError struct {
+	msg string
+}
+
+func (e *MaxDevicesExchangeNotExpired) Error() {
+	return e.msg
+}
 
 // Device is the entity that will validate the business
 // rules for creating a user device in persistency layer
@@ -29,23 +24,40 @@ type Device struct {
 	CreatedAt time.Time
 }
 
+// ValidFields validates the fields of the Device
+func (d *Device) ValidFields() error {
+		if d.Name == "" {
+			return &InvalidError{"attribute `Name` must not be empty"}
+		}
+
+		if d.Model == "" {
+			return &InvalidError{"attribute `Model` must not be empty"}
+		}
+
+		if d.Model != "Android" && d.Model != "iOS" {
+			return &InvalidError{"attribute `Model` must be `Android` or `iOS`"}
+		}
+
+		return nil
+}
+
 // Valid returns error if the current device isn't able
 // to be written to the persistency layer
-func (d *Device) Valid(ds []*Device, lastExchange time.Time) error {
+func (d *Device) Valid(ds []*Device, lastExchangedAt, lastRemovedAt time.Time) error {
 	exchangeExpired := true
 
-	if !lastExchange.IsZero() {
-		exchangeExpired = time.Since(lastExchange)/(24*time.Hour) > 30
+	if !lastExchangedAt.IsZero() {
+		exchangeExpired = time.Since(lastExchangedAt)/(24*time.Hour) > 30
 	}
 
 	if len(ds) == 3 {
 		if exchangeExpired {
-			return errors.New("devices max limit exceeded, but you still can do an exchanging")
+			return &InvalidError{"devices max limit exceeded, but you still can do an exchanging"}
 		}
 
-		return fmt.Errorf(
-			"devices max limit exceeded and you cannot do an exchanging. You can exchange a device in %d days",
-			(time.Since(lastExchange) / (24 * time.Hour)),
+		return &InvalidError{fmt.Errorf(
+			"devices max limit exceeded and you cannot do an exchanging. You can exchange a device at %s",
+			(time.Since(lastExchangedAt) / (24 * time.Hour))},
 		)
 	}
 
