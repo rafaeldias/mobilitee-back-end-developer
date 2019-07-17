@@ -1,7 +1,6 @@
 package device
 
 import (
-	"errors"
 	"fmt"
 	"time"
 )
@@ -11,7 +10,8 @@ type InvalidError struct {
 	msg string
 }
 
-func (e *MaxDevicesExchangeNotExpired) Error() {
+// Implements the error interface
+func (e *InvalidError) Error() string {
 	return e.msg
 }
 
@@ -26,19 +26,23 @@ type Device struct {
 
 // ValidFields validates the fields of the Device
 func (d *Device) ValidFields() error {
-		if d.Name == "" {
-			return &InvalidError{"attribute `Name` must not be empty"}
-		}
+	if d.Name == "" {
+		return &InvalidError{"attribute `Name` must not be empty"}
+	}
 
-		if d.Model == "" {
-			return &InvalidError{"attribute `Model` must not be empty"}
-		}
+	if d.Model == "" {
+		return &InvalidError{"attribute `Model` must not be empty"}
+	}
 
-		if d.Model != "Android" && d.Model != "iOS" {
-			return &InvalidError{"attribute `Model` must be `Android` or `iOS`"}
-		}
+	if d.Model != "Android" && d.Model != "iOS" {
+		return &InvalidError{"attribute `Model` must be `Android` or `iOS`"}
+	}
 
-		return nil
+	if d.User == 0 {
+		return &InvalidError{"invalid user"}
+	}
+
+	return nil
 }
 
 // Valid returns error if the current device isn't able
@@ -47,7 +51,7 @@ func (d *Device) Valid(ds []*Device, lastExchangedAt, lastRemovedAt time.Time) e
 	exchangeExpired := true
 
 	if !lastExchangedAt.IsZero() {
-		exchangeExpired = time.Since(lastExchangedAt)/(24*time.Hour) > 30
+		exchangeExpired = (time.Since(lastExchangedAt).Hours() / 24) > 30
 	}
 
 	if len(ds) == 3 {
@@ -55,11 +59,19 @@ func (d *Device) Valid(ds []*Device, lastExchangedAt, lastRemovedAt time.Time) e
 			return &InvalidError{"devices max limit exceeded, but you still can do an exchanging"}
 		}
 
-		return &InvalidError{fmt.Errorf(
+		thirtyDays := time.Hour * 24 * 30
+		nextExchangeIn := thirtyDays - time.Since(lastExchangedAt)
+
+		return &InvalidError{fmt.Sprintf(
 			"devices max limit exceeded and you cannot do an exchanging. You can exchange a device at %s",
-			(time.Since(lastExchangedAt) / (24 * time.Hour))},
-		)
+			(time.Now().Add(nextExchangeIn).Format("2006-01-02")))}
 	}
+
+	//var isExchanging bool
+
+	//if !lastRemovedAt.IsZero() {
+	//  isExchanging = (time.
+	//}
 
 	//if !exchangeExpired {
 	//	return fmt.Errorf(
