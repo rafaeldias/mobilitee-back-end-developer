@@ -31,9 +31,9 @@ func TestNewRepository(t *testing.T) {
 
 func TestRepositoryRead(t *testing.T) {
 	testCases := []struct {
-		id          int
-		wantQuery   string
-		wantDevices []*Device
+		ID          int
+		WantQuery   string
+		WantDevices []*Device
 	}{
 		{0, "SELECT \\* FROM `devices`", []*Device{&Device{ID: 0}}},
 		{1, "SELECT \\* FROM `devices` WHERE \\(`devices`\\.`id` = 1\\)", []*Device{&Device{ID: 1}}},
@@ -53,19 +53,19 @@ func TestRepositoryRead(t *testing.T) {
 				db, err.Error())
 		}
 
-		rows := sqlmock.NewRows([]string{"id"}).AddRow(tc.id)
-		mock.ExpectQuery(tc.wantQuery).WillReturnRows(rows)
+		rows := sqlmock.NewRows([]string{"id"}).AddRow(tc.ID)
+		mock.ExpectQuery(tc.WantQuery).WillReturnRows(rows)
 
 		repo := NewRepository(g)
 
-		devices, err := repo.Read(tc.id)
+		devices, err := repo.Read(tc.ID)
 		if err != nil {
 			t.Errorf("got error while calling repo.Read(%d): %s, want nil",
-				tc.id, err.Error())
+				tc.ID, err.Error())
 		}
 
-		if !reflect.DeepEqual(tc.wantDevices, devices) {
-			t.Errorf("got devices from repo.Read(%d): %+v, want: %+v", tc.id,
+		if !reflect.DeepEqual(tc.WantDevices, devices) {
+			t.Errorf("got devices from repo.Read(%d): %+v, want: %+v", tc.ID,
 				devices, tc.wantDevices)
 
 		}

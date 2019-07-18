@@ -7,13 +7,13 @@ import (
 
 type repoUpdater struct {
 	err    error
-	ID     int
-	Device *Device
+	id     int
+	device *Device
 }
 
-func (u *repoUpdater) Update(ID int, d *Device) error {
-	u.ID = ID
-	u.Device = d
+func (u *repoUpdater) Update(id int, d *Device) error {
+	u.id = id
+	u.device = d
 	return u.err
 }
 
@@ -36,13 +36,13 @@ func TestNew(t *testing.T) {
 
 func TestDeviceUpdate(t *testing.T) {
 	testCases := []struct {
-		ID     int
-		Device *Device
+		id     int
+		device *Device
 		repo   *repoUpdater
 	}{
 		{
 			1,
-			&Device{"New Name Testing"},
+			&Device{Name: "New Name Testing"},
 			&repoUpdater{},
 		},
 	}
@@ -50,25 +50,25 @@ func TestDeviceUpdate(t *testing.T) {
 	for _, tc := range testCases {
 		d := New(tc.repo)
 
-		if err := d.Update(tc.ID, tc.Device); err != nil {
+		if err := d.Update(tc.id, tc.device); err != nil {
 			t.Errorf("go error while calling device.Update(%d, %+v): %s, want nil",
-				tc.ID, tc.Device, err.Error())
+				tc.id, tc.device, err.Error())
 		}
 
-		if !reflect.DeepEqual(tc.repo.Device, tc.Device) {
-			t.Errorf("got repo.Device: %+v, want %+v", tc.repo.Device, tc.Device)
+		if !reflect.DeepEqual(tc.repo.device, tc.device) {
+			t.Errorf("got repo.Device: %+v, want %+v", tc.repo.device, tc.device)
 		}
 
-		if tc.repo.ID != tc.ID {
-			t.Errorf("got repo.ID: %d, want %d", tc.repo.ID, tc.ID)
+		if tc.repo.id != tc.id {
+			t.Errorf("got repo.ID: %d, want %d", tc.repo.id, tc.id)
 		}
 	}
 }
 
 func TestDeviceUpdateError(t *testing.T) {
 	testCases := []struct {
-		ID     int
-		Device *Device
+		id     int
+		device *Device
 		repo   *repoUpdater
 	}{
 		{
@@ -86,9 +86,9 @@ func TestDeviceUpdateError(t *testing.T) {
 	for _, tc := range testCases {
 		d := New(tc.repo)
 
-		if err := d.Update(tc.ID, tc.Device); err == nil {
+		if err := d.Update(tc.id, tc.device); err == nil {
 			t.Errorf("go error nil while calling device.Update(%d, %+v), want not nil",
-				tc.ID, tc.Device)
+				tc.id, tc.device)
 		}
 	}
 }
