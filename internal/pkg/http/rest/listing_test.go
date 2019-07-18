@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/rafaeldias/mobilitee-back-end-developer/internal/pkg/listing/device"
+	//"github.com/rafaeldias/mobilitee-back-end-developer/internal/pkg/listing/device"
 )
 
 type getterTest struct {
@@ -17,41 +17,33 @@ func (g *getterTest) GET(path string, h httprouter.Handle) {
 	g.handle = h
 }
 
-type deviceReader struct {
-	id      int
-	err     error
-	devices []*device.Device
-}
-
-func (r *deviceReader) Read(id int) ([]*device.Device, error) {
-	return r.devices, r.err
-
-}
+// Don't need this yer
+//type deviceReader struct {
+//	id      int
+//	err     error
+//	devices []*device.Device
+//}
+//
+//func (r *deviceReader) Read(id int) ([]*device.Device, error) {
+//	return r.devices, r.err
+//
+//}
 
 func TestGetDeviceRoutes(t *testing.T) {
 	testCases := []struct {
-		path   string
-		getter *getterTest
-		reader *deviceReader
+		path string
 	}{
-		{
-			"/devices",
-			&getterTest{},
-			&deviceReader{},
-		},
-		{
-			"/devices/:id",
-			&getterTest{},
-			&deviceReader{},
-		},
+		{"/devices"},
+		{"/devices/:id"},
 	}
 
 	for _, tc := range testCases {
-		GetDevices(tc.getter, tc.reader)
+		getter := &getterTest{}
+		GetDevices(getter, nil)
 
 		var pathInList bool
 
-		for _, path := range tc.getter.paths {
+		for _, path := range getter.paths {
 			if pathInList = path == tc.path; pathInList {
 				break
 			}
