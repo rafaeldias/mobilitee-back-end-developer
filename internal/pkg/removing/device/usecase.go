@@ -1,4 +1,4 @@
-package dvice
+package device
 
 // Remover is the interface that removes
 // the device from pesistency layer

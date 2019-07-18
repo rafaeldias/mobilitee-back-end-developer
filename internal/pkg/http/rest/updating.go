@@ -10,14 +10,14 @@ import (
 	"github.com/rafaeldias/mobilitee-back-end-developer/internal/pkg/updating/device"
 )
 
-// HTTPPatch is an interface that handles the datails of
+// HTTPPatcher is an interface that handles the datails of
 // parsing an PATCH request to the server
-type HTTPPatch interface {
+type HTTPPatcher interface {
 	PATCH(path string, h httprouter.Handle)
 }
 
 // UpdateDevice handles the requests for updating devices
-func UpdateDevice(router HTTPPatch, updater device.Updater) {
+func UpdateDevice(router HTTPPatcher, updater device.Updater) {
 	router.PATCH("/devices/:id", updateDeviceHandler(updater))
 }
 
