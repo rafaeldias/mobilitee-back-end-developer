@@ -2,21 +2,12 @@ package rest
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rafaeldias/mobilitee-back-end-developer/internal/pkg/listing/device"
 )
-
-var errInvalidID = errors.New(`id parameter must be an integer and greater than 0`)
-
-// Err is the struct that will be returned as
-// the responste to a failed HTTP request
-type Err struct {
-	Error string
-}
 
 // HTTPGetter is an interface that handles the datails of
 // parsing an GET request to the server

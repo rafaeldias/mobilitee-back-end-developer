@@ -1,12 +1,25 @@
 package device
 
-import "errors"
+import "fmt"
 
 // ErrInvalidInput describes the invalid data user inputed
-type ErrInvalidInput error
+type ErrInvalidInput struct {
+	Attr string
+	Must string
+}
 
-// ErrDeviceNotFound describes a device being edited not found
-type ErrDeviceNotFound error
+func (e *ErrInvalidInput) Error() string {
+	return fmt.Sprintf("attibute %s must %s", e.Attr, e.Must)
+}
+
+// ErrNotFound describes a device being edited not found
+type ErrNotFound struct {
+	ID int
+}
+
+func (e *ErrNotFound) Error() string {
+	return fmt.Sprintf("device of ID %d was not found", e.ID)
+}
 
 // Updater edit the Device
 type Updater interface {
@@ -27,11 +40,11 @@ func New(repo Updater) *Usecase {
 // Update validates and edits a Device through the persistency layer
 func (u *Usecase) Update(id int, d *Device) error {
 	if id == 0 {
-		return ErrInvalidInput(errors.New("ID attribute must be greater than 0"))
+		return &ErrInvalidInput{Attr: "ID", Must: "be greater than 0"}
 	}
 
 	if d.Name == "" {
-		return ErrInvalidInput(errors.New("Name attribute must not be empty"))
+		return &ErrInvalidInput{Attr: "Name", Must: "not be empty"}
 	}
 
 	return u.repo.Update(id, d)

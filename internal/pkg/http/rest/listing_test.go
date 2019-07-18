@@ -13,17 +13,25 @@ import (
 	"github.com/rafaeldias/mobilitee-back-end-developer/internal/pkg/listing/device"
 )
 
-type getterTest struct {
+type routerTest struct {
 	paths  []string
 	handle map[string]httprouter.Handle
 }
 
-func (g *getterTest) GET(path string, h httprouter.Handle) {
-	g.paths = append(g.paths, path)
-	if g.handle == nil {
-		g.handle = map[string]httprouter.Handle{}
+func (r *routerTest) handleReq(path string, h httprouter.Handle) {
+	r.paths = append(r.paths, path)
+	if r.handle == nil {
+		r.handle = map[string]httprouter.Handle{}
 	}
-	g.handle[path] = h
+	r.handle[path] = h
+}
+
+type getterTest struct {
+	*routerTest
+}
+
+func (g *getterTest) GET(path string, h httprouter.Handle) {
+	g.handleReq(path, h)
 }
 
 type deviceReader struct {
@@ -41,7 +49,6 @@ func TestGetDevices(t *testing.T) {
 	testCases := []struct {
 		path            string
 		params          httprouter.Params
-		getter          *getterTest
 		reader          *deviceReader
 		wantDevices     *Devices
 		wantDevice      *device.Device
@@ -51,7 +58,6 @@ func TestGetDevices(t *testing.T) {
 		{
 			"/devices",
 			httprouter.Params{},
-			&getterTest{},
 			&deviceReader{
 				devices: []*device.Device{
 					{ID: 1, Name: "Testing"},
@@ -69,7 +75,6 @@ func TestGetDevices(t *testing.T) {
 		{
 			"/devices",
 			httprouter.Params{},
-			&getterTest{},
 			&deviceReader{
 				devices: []*device.Device{},
 			},
@@ -85,7 +90,6 @@ func TestGetDevices(t *testing.T) {
 			httprouter.Params{
 				httprouter.Param{"id", "1"},
 			},
-			&getterTest{},
 			&deviceReader{
 				devices: []*device.Device{
 					{ID: 1, Name: "Testing"},
@@ -99,12 +103,13 @@ func TestGetDevices(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		GetDevices(tc.getter, tc.reader)
+		getter := &getterTest{&routerTest{}}
+		GetDevices(getter, tc.reader)
 
 		rw := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 
-		tc.getter.handle[tc.path](rw, req, tc.params)
+		getter.handle[tc.path](rw, req, tc.params)
 
 		res := rw.Result()
 
@@ -160,7 +165,6 @@ func TestGetDevicesError(t *testing.T) {
 	testCases := []struct {
 		path            string
 		params          httprouter.Params
-		getter          *getterTest
 		reader          *deviceReader
 		wantError       Err
 		wantContentType string
@@ -169,7 +173,6 @@ func TestGetDevicesError(t *testing.T) {
 		{
 			"/devices",
 			httprouter.Params{},
-			&getterTest{},
 			&deviceReader{
 				err: errors.New("Testing Error"),
 			},
@@ -182,7 +185,6 @@ func TestGetDevicesError(t *testing.T) {
 			httprouter.Params{
 				httprouter.Param{"id", "1"},
 			},
-			&getterTest{},
 			&deviceReader{
 				devices: []*device.Device{},
 			},
@@ -195,7 +197,6 @@ func TestGetDevicesError(t *testing.T) {
 			httprouter.Params{
 				httprouter.Param{"id", "xzy"},
 			},
-			&getterTest{},
 			&deviceReader{
 				devices: []*device.Device{},
 			},
@@ -208,7 +209,6 @@ func TestGetDevicesError(t *testing.T) {
 			httprouter.Params{
 				httprouter.Param{"id", "0"},
 			},
-			&getterTest{},
 			&deviceReader{
 				devices: []*device.Device{},
 			},
@@ -219,12 +219,14 @@ func TestGetDevicesError(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		GetDevices(tc.getter, tc.reader)
+		getter := &getterTest{&routerTest{}}
+
+		GetDevices(getter, tc.reader)
 
 		rw := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 
-		tc.getter.handle[tc.path](rw, req, tc.params)
+		getter.handle[tc.path](rw, req, tc.params)
 
 		res := rw.Result()
 

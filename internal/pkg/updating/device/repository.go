@@ -1,10 +1,6 @@
 package device
 
-import (
-	"errors"
-
-	"github.com/jinzhu/gorm"
-)
+import "github.com/jinzhu/gorm"
 
 // Repository implements the Updater interface
 // for editing devices in persistency layer
@@ -21,7 +17,7 @@ func NewRepository(db *gorm.DB) *Repository {
 func (r *Repository) Update(id int, d *Device) error {
 	err := r.db.Model(Device{}).Where("id = ?", id).Update(d).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return ErrDeviceNotFound(errors.New("device not found"))
+		return &ErrNotFound{id}
 	}
 	return err
 }
