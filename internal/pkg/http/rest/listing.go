@@ -1,6 +1,8 @@
 package rest
 
 import (
+	"net/http"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/rafaeldias/mobilitee-back-end-developer/internal/pkg/listing/device"
 )
@@ -13,6 +15,8 @@ type HTTPGetter interface {
 
 // GetDevices handles the requests for reading devices
 func GetDevices(router HTTPGetter, r device.Reader) {
-	router.GET("/devices", nil)
+	router.GET("/devices", func(rw http.ResponseWriter, req *http.Request, p httprouter.Params) {
+		rw.WriteHeader(http.StatusOK)
+	})
 	router.GET("/devices/:id", nil)
 }
