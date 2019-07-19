@@ -40,3 +40,7 @@
 [[constraint]]
   name = "github.com/julienschmidt/httprouter"
   version = "1.2.0"
+
+[metadata.heroku]
+  root-package = "github.com/rafaeldias/mobilitee-backend-developer/cmd/api/heroku"
+  install = ["./cmd/api/heroku"]
