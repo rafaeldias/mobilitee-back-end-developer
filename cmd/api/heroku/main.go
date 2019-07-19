@@ -12,7 +12,7 @@ func main() string {
 			w.Write([]byte("Hello"))
 	})
 
-	if err := http.ListenAndServer(post, nil); err != nil {
+	if err := http.ListenAndServe(post, nil); err != nil {
 		panic(err)
 	}
 }
