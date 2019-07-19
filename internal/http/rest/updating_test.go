@@ -34,7 +34,7 @@ func (u *deviceUpdater) Update(id int, d *device.Device) error {
 	return u.err
 }
 
-func TestUpdateDevices(t *testing.T) {
+func TestUpdateDevice(t *testing.T) {
 	testCases := []struct {
 		path           string
 		body           string
@@ -84,12 +84,13 @@ func TestUpdateDevices(t *testing.T) {
 
 func TestUpdateDeviceError(t *testing.T) {
 	testCases := []struct {
-		path           string
-		body           string
-		params         httprouter.Params
-		updater        *deviceUpdater
-		wantError      Err
-		wantStatusCode int
+		path            string
+		body            string
+		params          httprouter.Params
+		updater         *deviceUpdater
+		wantError       Err
+		wantStatusCode  int
+		wantContentType string
 	}{
 		{
 			"/devices/:id",
@@ -100,6 +101,7 @@ func TestUpdateDeviceError(t *testing.T) {
 			&deviceUpdater{},
 			Err{"invalid JSON syntax: EOF"},
 			http.StatusBadRequest,
+			"application/json",
 		},
 		{
 			"/devices/:id",
@@ -112,6 +114,7 @@ func TestUpdateDeviceError(t *testing.T) {
 			},
 			Err{"Testing Error"},
 			http.StatusInternalServerError,
+			"application/json",
 		},
 		{
 			"/devices/:id",
@@ -124,6 +127,7 @@ func TestUpdateDeviceError(t *testing.T) {
 			},
 			Err{(&device.ErrInvalidInput{"ID", "empty"}).Error()},
 			http.StatusBadRequest,
+			"application/json",
 		},
 		{
 			"/devices/:id",
@@ -136,6 +140,7 @@ func TestUpdateDeviceError(t *testing.T) {
 			},
 			Err{(&device.ErrNotFound{2}).Error()},
 			http.StatusNotFound,
+			"application/json",
 		},
 		{
 			"/devices/:id",
@@ -146,6 +151,7 @@ func TestUpdateDeviceError(t *testing.T) {
 			&deviceUpdater{},
 			Err{errInvalidID.Error()},
 			http.StatusBadRequest,
+			"application/json",
 		},
 	}
 
@@ -173,5 +179,10 @@ func TestUpdateDeviceError(t *testing.T) {
 		if !reflect.DeepEqual(tc.wantError, e) {
 			t.Errorf("got response body: %+v, want %+v", e, tc.wantError)
 		}
+
+		if c := rw.Header().Get("Content-Type"); c != tc.wantContentType {
+			t.Errorf("got http header `Content-Type`: %s, want %s", c, tc.wantContentType)
+		}
+
 	}
 }

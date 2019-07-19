@@ -71,11 +71,12 @@ func TestRemoveDevices(t *testing.T) {
 
 func TestRemoveDeviceError(t *testing.T) {
 	testCases := []struct {
-		path           string
-		params         httprouter.Params
-		remover        *deviceRemover
-		wantError      Err
-		wantStatusCode int
+		path            string
+		params          httprouter.Params
+		remover         *deviceRemover
+		wantError       Err
+		wantStatusCode  int
+		wantContentType string
 	}{
 		{
 			"/devices/:id",
@@ -87,6 +88,7 @@ func TestRemoveDeviceError(t *testing.T) {
 			},
 			Err{"Testing Error"},
 			http.StatusInternalServerError,
+			"application/json",
 		},
 		{
 			"/devices/:id",
@@ -96,6 +98,7 @@ func TestRemoveDeviceError(t *testing.T) {
 			&deviceRemover{},
 			Err{errInvalidID.Error()},
 			http.StatusBadRequest,
+			"application/json",
 		},
 	}
 
@@ -123,5 +126,10 @@ func TestRemoveDeviceError(t *testing.T) {
 		if !reflect.DeepEqual(tc.wantError, e) {
 			t.Errorf("got response body: %+v, want %+v", e, tc.wantError)
 		}
+
+		if c := rw.Header().Get("Content-Type"); c != tc.wantContentType {
+			t.Errorf("got http header `Content-Type`: %s, want %s", c, tc.wantContentType)
+		}
+
 	}
 }
