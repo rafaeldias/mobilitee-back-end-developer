@@ -1,8 +1,6 @@
 package device
 
-import (
-	"github.com/jinzhu/gorm"
-)
+import "github.com/jinzhu/gorm"
 
 // Repository is the handles the persistency layer
 // for listing Devices.
