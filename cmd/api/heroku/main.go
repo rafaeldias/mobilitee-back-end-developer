@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"net/http"
 )
@@ -12,7 +13,7 @@ func main() {
 			rw.Write([]byte("Hello"))
 	})
 
-	if err := http.ListenAndServe(port, nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil); err != nil {
 		panic(err)
 	}
 }
