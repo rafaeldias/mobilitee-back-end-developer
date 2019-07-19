@@ -21,7 +21,7 @@ func main() {
 		panic(err)
 	}
 
-	api.ReasfulDevice(httprouter.New(), device.New(db))
+	api.RestfulDevice(httprouter.New(), device.New(db))
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil); err != nil {
 		panic(err)
