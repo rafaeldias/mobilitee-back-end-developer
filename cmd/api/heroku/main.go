@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func main() string {
+func main() {
 	port := os.Getenv("PORT")
 
 	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
