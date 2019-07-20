@@ -47,12 +47,12 @@ func TestUsecaseRead(t *testing.T) {
 
 		devices, err := device.Read(tc.id)
 		if err != nil {
-			t.Errorf("got error while calling device.Read(%d): %s, want nil",
+			t.Errorf("got error while calling Device.Read(%d): %s, want nil",
 				tc.id, err.Error())
 		}
 
 		if !reflect.DeepEqual(tc.want, devices) {
-			t.Errorf("got devices from device.Read(%d): %+v, want: %+v", tc.id,
+			t.Errorf("got devices from Device.Read(%d): %+v, want: %+v", tc.id,
 				devices, tc.want)
 		}
 	}
@@ -70,7 +70,7 @@ func TestUsecaseReadError(t *testing.T) {
 
 		_, err := device.Read(0)
 		if err == nil {
-			t.Error("got error nil while calling device.Read(0):, want not nil")
+			t.Error("got error nil while calling Device.Read(0):, want not nil")
 		}
 	}
 }

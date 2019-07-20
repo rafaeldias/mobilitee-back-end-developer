@@ -24,22 +24,11 @@ type Device struct {
 	CreatedAt time.Time
 }
 
-// ValidFields validates the fields of the Device
-func (d *Device) ValidFields() error {
-	if d.Name == "" {
-		return &InvalidError{"attribute `Name` must not be empty"}
-	}
-
-	if d.Model == "" {
-		return &InvalidError{"attribute `Model` must not be empty"}
-	}
+// ValidModel validates the Model attribute of the Device
+func (d *Device) ValidModel() error {
 
 	if d.Model != "Android" && d.Model != "iOS" {
 		return &InvalidError{"attribute `Model` must be `Android` or `iOS`"}
-	}
-
-	if d.User == 0 {
-		return &InvalidError{"invalid user"}
 	}
 
 	return nil

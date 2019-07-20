@@ -11,9 +11,9 @@ func TestNew(t *testing.T) {
 		t.Errorf(errMsg, "Reader")
 	}
 
-	//if d.Writer == nil {
-	//	t.Errorf(errMsg, "Writer")
-	//}
+	if d.Writer == nil {
+		t.Errorf(errMsg, "Writer")
+	}
 
 	if d.Updater == nil {
 		t.Errorf(errMsg, "Updater")
