@@ -24,50 +24,39 @@ type Device struct {
 	CreatedAt time.Time
 }
 
-// ValidModel validates the Model attribute of the Device
-func (d *Device) ValidModel() error {
 
-	if d.Model != "Android" && d.Model != "iOS" {
-		return &InvalidError{"attribute `Model` must be `Android` or `iOS`"}
+// Valid returns error if the current device is able to be written/exchanged
+// to the persistency layer based on business logic
+func (d *Device) Valid(devices int, beingExchanged bool, latestExchangeExpiresAt time.Time) error {
+	if err := d.validModel(); err != nil {
+		return err
+	}
+
+	latestExchangeExpired := latestExchangeExpiresAt.IsZero()
+
+	if devices == 3 {
+		if latestExchangeExpired {
+			return &InvalidError{"devices max limit exceeded, but you still can do an exchanging."}
+		}
+
+		return &InvalidError{fmt.Sprintf(
+			"devices max limit exceeded and an exchange cannot be made. A new exchange can be made as of %s.",
+			latestExchangeExpiresAt.Format("2006-01-02"))}
+	}
+
+	if beingExchanged && !latestExchangeExpired {
+		return &InvalidError{fmt.Sprintf(
+			"you've recently made a device exchange. You can make another one as of %s",
+			latestExchangeExpiresAt.Format("2006-01-02"))}
 	}
 
 	return nil
 }
 
-// Valid returns error if the current device isn't able
-// to be written to the persistency layer
-func (d *Device) Valid(ds []*Device, lastExchangedAt, lastRemovedAt time.Time) error {
-	exchangeExpired := true
-
-	if !lastExchangedAt.IsZero() {
-		exchangeExpired = (time.Since(lastExchangedAt).Hours() / 24) > 30
+func (d *Device) validModel() error {
+	if d.Model != "Android" && d.Model != "iOS" {
+		return &InvalidError{"attribute `Model` must be `Android` or `iOS`"}
 	}
-
-	if len(ds) == 3 {
-		if exchangeExpired {
-			return &InvalidError{"devices max limit exceeded, but you still can do an exchanging"}
-		}
-
-		thirtyDays := time.Hour * 24 * 30
-		nextExchangeIn := thirtyDays - time.Since(lastExchangedAt)
-
-		return &InvalidError{fmt.Sprintf(
-			"devices max limit exceeded and you cannot do an exchanging. You can exchange a device at %s",
-			(time.Now().Add(nextExchangeIn).Format("2006-01-02")))}
-	}
-
-	//var isExchanging bool
-
-	//if !lastRemovedAt.IsZero() {
-	//  isExchanging = (time.
-	//}
-
-	//if !exchangeExpired {
-	//	return fmt.Errorf(
-	//		"You've recently exchanged a device. You can exchange or add a new one in %d days",
-	//		(time.Since(lastExchange) / (24 * time.Hour)),
-	//	)
-	//}
 
 	return nil
 }

@@ -1,86 +1,78 @@
 package device
 
 import (
-	//"fmt"
 	"testing"
 	"time"
 )
 
-func TestValidModel(t *testing.T) {
+func TestValid(t *testing.T) {
 	testCases := []struct {
-		Device *Device
+		device            *Device
+		devices           int
+		beingExchanged    bool
+		lastestExchangeAt time.Time
 	}{
-		{&Device{Model: "Android"}},
-		{&Device{Model: "iOS"}},
+		{
+			&Device{Model: "Android"},
+			0,
+			false,
+			time.Time{},
+		},
+		{
+			&Device{Model: "iOS"},
+			2,
+			true,
+			time.Time{},
+		},
 	}
 
 	for _, tc := range testCases {
-		if err := tc.Device.ValidModel(); err != nil {
-			t.Errorf("got error while calling Device.ValidModel(%+v): %s, want nil",
-				tc.Device, err.Error())
-		}
-	}
-}
-
-func TestValidModelError(t *testing.T) {
-	testCases := []struct {
-		Device *Device
-	}{
-		{&Device{Model: "Windows"}},
-	}
-
-	for _, tc := range testCases {
-		if err := tc.Device.ValidModel(); err == nil {
-			t.Errorf("got error nil while calling Device.ValidModel(%+v), want not nil",
-				tc.Device)
+		err := tc.device.Valid(tc.devices, tc.beingExchanged, tc.lastestExchangeAt)
+		if err != nil {
+			t.Errorf("got error while calling Device.Valid(%d, %t, %s): %s, want nil",
+				tc.devices, tc.beingExchanged, tc.lastestExchangeAt, err.Error())
 		}
 	}
 }
 
 func TestValidError(t *testing.T) {
 	testCases := []struct {
-		Device          *Device
-		Devices         []*Device
-		LastExchangedAt time.Time
-		LastRemovedAt   time.Time
+		device            *Device
+		devices           int
+		beingExchanged    bool
+		lastestExchangeAt time.Time
 	}{
 		{
-			&Device{Name: "Testing", Model: "Android"},
-			[]*Device{
-				&Device{Name: "Smartphone", Model: "Android"},
-				&Device{Name: "Smartphone", Model: "iOS"},
-				&Device{Name: "Tablet", Model: "iOS"},
-			},
-			time.Time{},
+			&Device{Model: "windows"},
+			0,
+			false,
 			time.Time{},
 		},
 		{
-			&Device{Name: "Testing", Model: "Android"},
-			[]*Device{
-				&Device{Name: "Smartphone", Model: "Android"},
-				&Device{Name: "Smartphone", Model: "iOS"},
-				&Device{Name: "Tablet", Model: "iOS"},
-			},
-			time.Now().AddDate(0, 0, -20),
+			&Device{Model: "Android"},
+			3,
+			false,
 			time.Time{},
 		},
-		//{
-		//	&Device{Name: "Testing", Model: "Android"},
-		//	[]*Device{
-		//		&Device{Name: "Smartphone", Model: "Android"},
-		//		&Device{Name: "Smartphone", Model: "iOS"},
-		//	},
-		//	time.Now().AddDate(0, 0, -10),
-		//	time.Now().AddDate(0, 0, -5),
-		//},
+		{
+			&Device{Model: "iOS"},
+			3,
+			false,
+			time.Now().AddDate(0, 0, 20),
+		},
+		{
+			&Device{Model: "Android"},
+			2,
+			true,
+			time.Now().AddDate(0, 0, 20),
+		},
 	}
 
 	for _, tc := range testCases {
-		err := tc.Device.Valid(tc.Devices, tc.LastExchangedAt, tc.LastRemovedAt)
-		//fmt.Println(err.Error())
+		err := tc.device.Valid(tc.devices, tc.beingExchanged, tc.lastestExchangeAt)
 		if err == nil {
-			t.Errorf("got error nil while calling Device.Valid(%+v, %+v), want not nil",
-				tc.Devices, tc.LastExchangedAt)
+			t.Errorf("got error nil while calling Device.Valid(%d, %t, %s), want not nil",
+				tc.devices, tc.beingExchanged, tc.lastestExchangeAt)
 		}
 	}
 }
