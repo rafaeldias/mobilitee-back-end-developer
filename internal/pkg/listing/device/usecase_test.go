@@ -10,8 +10,8 @@ type repoReader struct {
 	err error
 }
 
-func (r *repoReader) Read(ID int) ([]*Device, error) {
-	return []*Device{&Device{ID: ID}}, r.err
+func (r *repoReader) Read(id int) ([]*Device, error) {
+	return []*Device{&Device{ID: id}}, r.err
 }
 
 func TestNew(t *testing.T) {

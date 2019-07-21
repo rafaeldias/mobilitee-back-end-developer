@@ -16,7 +16,7 @@ func TestNewRepository(t *testing.T) {
 
 	g, err := gorm.Open("mysql", db)
 	if err != nil {
-		t.Errorf("got error while calling gotm.Open(\"mysql\", %+v): %s, want nil",
+		t.Errorf("got error while calling gorm.Open(\"mysql\", %+v): %s, want nil",
 			db, err.Error())
 	}
 	defer g.Close()

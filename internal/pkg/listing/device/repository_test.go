@@ -32,8 +32,8 @@ func TestNewRepository(t *testing.T) {
 func TestRepositoryRead(t *testing.T) {
 	testCases := []struct {
 		ID          int
-		WantQuery   string
-		WantDevices []*Device
+		wantQuery   string
+		wantDevices []*Device
 	}{
 		{0, "SELECT \\* FROM `devices`", []*Device{&Device{ID: 0}}},
 		{1, "SELECT \\* FROM `devices` WHERE \\(`devices`\\.`id` = 1\\)", []*Device{&Device{ID: 1}}},
@@ -54,7 +54,7 @@ func TestRepositoryRead(t *testing.T) {
 		}
 
 		rows := sqlmock.NewRows([]string{"id"}).AddRow(tc.ID)
-		mock.ExpectQuery(tc.WantQuery).WillReturnRows(rows)
+		mock.ExpectQuery(tc.wantQuery).WillReturnRows(rows)
 
 		repo := NewRepository(g)
 
@@ -64,7 +64,7 @@ func TestRepositoryRead(t *testing.T) {
 				tc.ID, err.Error())
 		}
 
-		if !reflect.DeepEqual(tc.WantDevices, devices) {
+		if !reflect.DeepEqual(tc.wantDevices, devices) {
 			t.Errorf("got devices from repo.Read(%d): %+v, want: %+v", tc.ID,
 				devices, tc.wantDevices)
 

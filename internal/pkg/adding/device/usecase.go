@@ -10,10 +10,10 @@ type Writer interface {
 }
 
 // Exchanger is
-type Exchanger interface {
-	IsExchanging(user int) (bool, error)
-	LastExchangeExpired(user int) (expired bool, nexExchangeAt time.Time, err error)
-	CountDevices(user int) int
+type User interface {
+	IsExchanging(user int) (exchanging bool, device int, err error)
+	LastExchangingExpiresAt(user int) (time.Time, error)
+	CountDevices(user int) (int, error)
 }
 
 // Usecase controls the data flow for creating a device
@@ -26,7 +26,7 @@ func New(repo Writer) *Usecase {
 	return &Usecase{repo}
 }
 
-// Write is
+// Write controls the flow of data for creating/exchanging a device
 func (u *Usecase) Write(d *Device) (id int, err error) {
 	id, err = u.repo.Write(d)
 
@@ -34,7 +34,7 @@ func (u *Usecase) Write(d *Device) (id int, err error) {
 }
 
 // ValidFields validates application-specific requirements
-// for creating a device
+// for creating/exchanging a device
 func (u *Usecase) ValidFields(d *Device) error {
 	if d.Name == "" {
 		return &InvalidError{"attribute `Name` must not be empty"}

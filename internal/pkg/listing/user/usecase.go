@@ -36,7 +36,7 @@ func (u *Usecase) IsExchanging(user int) (exchanging bool, device int, err error
 }
 
 // LatestExchangeExpiresAt returns the next date the user can do a new exchanging
-// if the last exchanging hasn't expired or never occurred, or error.
+// if the lastest exchanging hasn't expired or never occurred, or error.
 func (u *Usecase) LatestExchangeExpiresAt(user int) (time.Time, error) {
 	d, err := u.repo.LatestExchange(user)
 	if err != nil {
