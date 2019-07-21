@@ -95,7 +95,7 @@ func TestRepositoryUpdateError(t *testing.T) {
 		repo := NewRepository(g)
 
 		if err := repo.Update(1, &Device{Name: "New Name"}); err == nil {
-			t.Error("got error nil while calling repo.Update(0, &Device{}): nil; want not nil")
+			t.Error("got error nil while calling repo.Update(0, &Device{}); want not nil")
 		}
 		g.Close()
 	}

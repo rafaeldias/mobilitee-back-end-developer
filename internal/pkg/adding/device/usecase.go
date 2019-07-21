@@ -12,7 +12,7 @@ type Writer interface {
 type WriteExchanger interface {
 	Writer
 	// returns the id of the the new device or error
-	Exchange(device int, nw *Device) (id int, err error)
+	Exchange(old, nw *Device) (id int, err error)
 }
 
 // User is the interface that reads user data statuses.
@@ -63,7 +63,7 @@ func (u *Usecase) Write(dvice *Device) (id int, err error) {
 	}
 
 	if exchanging {
-		id, err = u.repo.Exchange(old, dvice)
+		id, err = u.repo.Exchange(&Device{ID: old}, dvice)
 		return
 	}
 

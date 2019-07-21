@@ -18,9 +18,11 @@ func (e *InvalidError) Error() string {
 // Device is the entity that will validate the business
 // rules for creating a user device in persistency layer
 type Device struct {
+	ID	  int
 	Name      string
 	Model     string
 	User      int
+	Exchanged int
 	CreatedAt time.Time
 }
 

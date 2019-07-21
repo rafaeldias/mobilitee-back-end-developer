@@ -10,7 +10,7 @@ import (
 type repoWriteExchanger struct {
 	id	    int
 	nw	    *Device
-	old	    int
+	old	    *Device
 	exchangeErr error
 	writeErr    error
 }
@@ -24,7 +24,7 @@ func (r *repoWriteExchanger) Write(d *Device) (id int, err error) {
 	return
 }
 
-func (r *repoWriteExchanger) Exchange(old int, nw *Device) (id int, err error) {
+func (r *repoWriteExchanger) Exchange(old, nw *Device) (id int, err error) {
 	r.old = old
 	r.nw = nw
 
@@ -136,9 +136,9 @@ func TestUsecaseWrite(t *testing.T) {
 				tc.user.user, tc.dvice.User)
 		}
 
-		if tc.user.exchanging && !reflect.DeepEqual(tc.user.device, tc.repo.old) {
-			t.Errorf("got repo.old from calling Device.Write(%+v): %+v, want: %+v", tc.dvice,
-				tc.repo.old, tc.user.device)
+		if tc.user.exchanging && !reflect.DeepEqual(tc.user.device, tc.repo.old.ID) {
+			t.Errorf("got repo.old from calling Device.Write(%+v): %d, want: %d", tc.dvice,
+				tc.repo.old.ID, tc.user.device)
 		}
 	}
 }
