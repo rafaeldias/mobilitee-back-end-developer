@@ -8,7 +8,7 @@ CREATE TABLE devices (
   "created_at" date,
   "updated_at" date,
   "deleted_at" date,
-  "exchanged" boolean DEFAULT FALSE
+  "exchanged_by" integer
 );
 
 -- +goose Down
