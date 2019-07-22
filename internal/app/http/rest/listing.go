@@ -24,7 +24,7 @@ type Devices struct {
 
 // GetDevices handles the requests for reading devices
 func GetDevices(router HTTPGetter, r device.Reader) {
-	router.GET("/aoi/devices", getDevicesHandler(r))
+	router.GET("/api/devices", getDevicesHandler(r))
 	router.GET("/api/devices/:id", getDevicesHandler(r))
 }
 
