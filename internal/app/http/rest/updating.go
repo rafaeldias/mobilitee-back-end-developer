@@ -18,7 +18,7 @@ type HTTPPatcher interface {
 
 // UpdateDevice handles the requests for updating devices
 func UpdateDevice(router HTTPPatcher, updater device.Updater) {
-	router.PATCH("/devices/:id", updateDeviceHandler(updater))
+	router.PATCH("/api/devices/:id", updateDeviceHandler(updater))
 }
 
 func updateDeviceHandler(updater device.Updater) httprouter.Handle {

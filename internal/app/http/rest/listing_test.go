@@ -56,7 +56,7 @@ func TestGetDevices(t *testing.T) {
 		wantStatusCode  int
 	}{
 		{
-			"/devices",
+			"/api/devices",
 			httprouter.Params{},
 			&deviceReader{
 				devices: []*device.Device{
@@ -73,7 +73,7 @@ func TestGetDevices(t *testing.T) {
 			http.StatusOK,
 		},
 		{
-			"/devices",
+			"/api/devices",
 			httprouter.Params{},
 			&deviceReader{
 				devices: []*device.Device{},
@@ -86,7 +86,7 @@ func TestGetDevices(t *testing.T) {
 			http.StatusOK,
 		},
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			httprouter.Params{
 				httprouter.Param{"id", "1"},
 			},
@@ -171,7 +171,7 @@ func TestGetDevicesError(t *testing.T) {
 		wantStatusCode  int
 	}{
 		{
-			"/devices",
+			"/api/devices",
 			httprouter.Params{},
 			&deviceReader{
 				err: errors.New("Testing Error"),
@@ -181,7 +181,7 @@ func TestGetDevicesError(t *testing.T) {
 			http.StatusInternalServerError,
 		},
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			httprouter.Params{
 				httprouter.Param{"id", "1"},
 			},
@@ -193,7 +193,7 @@ func TestGetDevicesError(t *testing.T) {
 			http.StatusNotFound,
 		},
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			httprouter.Params{
 				httprouter.Param{"id", "xzy"},
 			},
@@ -205,7 +205,7 @@ func TestGetDevicesError(t *testing.T) {
 			http.StatusBadRequest,
 		},
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			httprouter.Params{
 				httprouter.Param{"id", "0"},
 			},

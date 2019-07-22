@@ -43,7 +43,7 @@ func TestUpdateDevice(t *testing.T) {
 		wantStatusCode int
 	}{
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			`{"Name":"Testing"}`,
 			httprouter.Params{
 				httprouter.Param{"id", "1"},
@@ -93,7 +93,7 @@ func TestUpdateDeviceError(t *testing.T) {
 		wantContentType string
 	}{
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			``,
 			httprouter.Params{
 				httprouter.Param{"id", "1"},
@@ -104,7 +104,7 @@ func TestUpdateDeviceError(t *testing.T) {
 			"application/json",
 		},
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			`{}`,
 			httprouter.Params{
 				httprouter.Param{"id", "1"},
@@ -117,7 +117,7 @@ func TestUpdateDeviceError(t *testing.T) {
 			"application/json",
 		},
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			`{"Name": ""}`,
 			httprouter.Params{
 				httprouter.Param{"id", "1"},
@@ -130,7 +130,7 @@ func TestUpdateDeviceError(t *testing.T) {
 			"application/json",
 		},
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			`{"Name": ""}`,
 			httprouter.Params{
 				httprouter.Param{"id", "2"},
@@ -143,7 +143,7 @@ func TestUpdateDeviceError(t *testing.T) {
 			"application/json",
 		},
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			`{"Name": ""}`,
 			httprouter.Params{
 				httprouter.Param{"id", "xyz"},

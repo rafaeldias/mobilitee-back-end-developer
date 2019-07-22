@@ -47,7 +47,7 @@ func TestCreateDevice(t *testing.T) {
 		wantContentType    string
 	}{
 		{
-			"/devices",
+			"/api/devices",
 			`{"Name":"Testing","Model":"Android","User":1}`,
 			&deviceWriter{
 				id: 1,
@@ -114,7 +114,7 @@ func TestCreateDeviceError(t *testing.T) {
 		wantContentType string
 	}{
 		{
-			"/devices",
+			"/api/devices",
 			``,
 			&deviceWriter{},
 			Err{"invalid JSON syntax: EOF"},
@@ -122,7 +122,7 @@ func TestCreateDeviceError(t *testing.T) {
 			"application/json",
 		},
 		{
-			"/devices",
+			"/api/devices",
 			`{}`,
 			&deviceWriter{
 				err: errors.New("Testing Error"),

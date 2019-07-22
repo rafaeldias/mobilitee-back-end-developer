@@ -22,7 +22,7 @@ type HTTPPoster interface {
 
 // CreateDevice handles the requests for creating devices
 func CreateDevice(router HTTPPoster, writer device.Writer) {
-	router.POST("/devices", createDeviceHandler(writer))
+	router.POST("/api/devices", createDeviceHandler(writer))
 }
 
 func createDeviceHandler(writer device.Writer) httprouter.Handle {
