@@ -24,7 +24,7 @@ func (r *Repository) LatestRemoved(user int) (*Device, error) {
 		Group("id").
 		Order("deleted_at ASC").
 		Limit(1).
-		Find(d).Error; err != nil && !gorm.IsRecordNotFound(err) {
+		Find(d).Error; err != nil && !gorm.IsRecordNotFoundError(err) {
 		return nil, err
 	}
 
@@ -38,7 +38,7 @@ func (r *Repository) LatestExchange(user int) (*Device, error) {
 	if err := r.db.Select("MAX(devices.created_at) as latest_exchange_at").
 		Joins("JOIN devices d ON d.exchanged = device.id").
 		Where("devices.user = ?", user).
-		Find(d).Error; err != nil && !gorm.IsRecordNotFound(err)  {
+		Find(d).Error; err != nil && !gorm.IsRecordNotFoundError(err)  {
 		return nil, err
 	}
 	return d, nil
