@@ -35,9 +35,8 @@ func createDeviceHandler(writer device.Writer) httprouter.Handle {
 		rw.Header().Set("Content-Type", "application/json")
 
 		if err := json.NewDecoder(req.Body).Decode(&dvice); err != nil {
-			rw.WriteHeader(http.StatusBadRequest)
-			encoder.Encode(Err{fmt.Sprintf("invalid JSON syntax: %s",
-				err.Error())})
+			(&Err{fmt.Sprintf("invalid JSON syntax: %s",
+				err.Error())}).Write(rw, http.StatusBadRequest)
 			return
 		}
 
@@ -51,8 +50,7 @@ func createDeviceHandler(writer device.Writer) httprouter.Handle {
 				status = http.StatusInternalServerError
 			}
 
-			rw.WriteHeader(status)
-			encoder.Encode(Err{err.Error()})
+			(&Err{err.Error()}).Write(rw, status)
 			return
 		}
 

@@ -41,8 +41,7 @@ func getDevicesHandler(r device.Reader) httprouter.Handle {
 		if param := p.ByName("id"); param != "" {
 			pid, err := strconv.Atoi(param)
 			if err != nil || pid == 0 {
-				rw.WriteHeader(http.StatusBadRequest)
-				encoder.Encode(Err{errInvalidID.Error()})
+				(&Err{errInvalidID.Error()}).Write(rw, http.StatusBadRequest)
 				return
 			}
 
@@ -51,14 +50,12 @@ func getDevicesHandler(r device.Reader) httprouter.Handle {
 
 		devices, err := r.Read(id)
 		if err != nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			encoder.Encode(Err{err.Error()})
+			(&Err{err.Error()}).Write(rw, http.StatusInternalServerError)
 			return
 		}
 
 		if id > 0 && len(devices) == 0 {
-			rw.WriteHeader(http.StatusNotFound)
-			encoder.Encode(Err{http.StatusText(http.StatusNotFound)})
+			(&Err{http.StatusText(http.StatusNotFound)}).Write(rw, http.StatusNotFound)
 			return
 		}
 

@@ -25,23 +25,17 @@ func updateDeviceHandler(updater device.Updater) httprouter.Handle {
 	return func(rw http.ResponseWriter, req *http.Request, param httprouter.Params) {
 		var (
 			dvice   *device.Device
-			encoder = json.NewEncoder(rw)
-			header  = rw.Header()
 		)
 
 		if err := json.NewDecoder(req.Body).Decode(&dvice); err != nil {
-			header.Set("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			encoder.Encode(Err{fmt.Sprintf("invalid JSON syntax: %s",
-				err.Error())})
+			(&Err{fmt.Sprintf("invalid JSON syntax: %s",
+				err.Error())}).Write(rw, http.StatusBadRequest)
 			return
 		}
 
 		id, err := strconv.Atoi(param.ByName("id"))
 		if err != nil {
-			header.Set("Content-Type", "application/json")
-			rw.WriteHeader(http.StatusBadRequest)
-			encoder.Encode(Err{errInvalidID.Error()})
+			(&Err{errInvalidID.Error()}).Write(rw, http.StatusBadRequest)
 			return
 		}
 
@@ -57,9 +51,7 @@ func updateDeviceHandler(updater device.Updater) httprouter.Handle {
 				status = http.StatusInternalServerError
 			}
 
-			header.Set("Content-Type", "application/json")
-			rw.WriteHeader(status)
-			encoder.Encode(Err{err.Error()})
+			(&Err{err.Error()}).Write(rw, status)
 			return
 		}
 		rw.WriteHeader(http.StatusNoContent)
