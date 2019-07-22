@@ -7,7 +7,6 @@ import (
 // Device is the representation of a user Device.
 type Device struct {
 	ID		  int
-	Total		  int
 	LatestExchangeAt  time.Time
 	LatestRemovedAt   time.Time
 }
