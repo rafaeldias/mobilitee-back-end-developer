@@ -104,7 +104,7 @@ func TestLatestExchange(t *testing.T) {
 			1,
 			time.Now(),
 			&Device{LatestExchangeAt: time.Now()},
-			"SELECT MAX\\(devices\\.created_at\\) as latest_exchange_at FROM `devices` JOIN devices d ON d\\.exchanged = device\\.id WHERE \\(devices.user = \\?\\)",
+			"SELECT MAX\\(devices\\.created_at\\) as latest_exchange_at FROM `devices` JOIN devices d ON d\\.exchanged = devices\\.id WHERE \\(devices.user = \\?\\)",
 		},
 	}
 

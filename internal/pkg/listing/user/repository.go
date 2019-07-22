@@ -36,7 +36,7 @@ func (r *Repository) LatestExchange(user int) (*Device, error) {
 	d := &Device{}
 
 	if err := r.db.Select("MAX(devices.created_at) as latest_exchange_at").
-		Joins("JOIN devices d ON d.exchanged = device.id").
+		Joins("JOIN devices d ON d.exchanged = devices.id").
 		Where("devices.user = ?", user).
 		Find(d).Error; err != nil && !gorm.IsRecordNotFoundError(err)  {
 		return nil, err
