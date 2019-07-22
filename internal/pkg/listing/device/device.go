@@ -10,4 +10,5 @@ type Device struct {
 	Model     string
 	User      int
 	CreatedAt time.Time
+	DeletedAt time.Time
 }
