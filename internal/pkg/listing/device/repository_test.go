@@ -35,9 +35,9 @@ func TestRepositoryRead(t *testing.T) {
 		wantQuery   string
 		wantDevices []*Device
 	}{
-		{0, "SELECT \\* FROM `devices`", []*Device{&Device{ID: 0}}},
-		{1, "SELECT \\* FROM `devices` WHERE \\(`devices`\\.`id` = 1\\)", []*Device{&Device{ID: 1}}},
-		{2, "SELECT \\* FROM `devices` WHERE \\(`devices`\\.`id` = 2\\)", []*Device{&Device{ID: 2}}},
+		{0, "SELECT \\* FROM `devices` WHERE `devices`.`deleted_at` IS NULL", []*Device{&Device{ID: 0}}},
+		{1, "SELECT \\* FROM `devices` WHERE `devices`.`deleted_at` IS NULL AND \\(\\(`devices`\\.`id` = 1\\)\\)", []*Device{&Device{ID: 1}}},
+		{2, "SELECT \\* FROM `devices` WHERE `devices`.`deleted_at` IS NULL AND \\(\\(`devices`\\.`id` = 2\\)\\)", []*Device{&Device{ID: 2}}},
 	}
 
 	for _, tc := range testCases {
