@@ -160,7 +160,7 @@ func TestRepositoryExchangeError(t *testing.T) {
 			func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec("INSERT INTO `devices`").
-					WithArgs(nw.Name, nw.Model, nw.User, nw.CreatedAt). 
+					WithArgs(nw.Name, nw.Model, nw.User, nw.CreatedAt).
 					WillReturnResult(sqlmock.NewResult(int64(nw.ID), 1))
 				mock.ExpectExec("UPDATE `devices`").
 					WithArgs(nw.ID, old.ID).
@@ -170,7 +170,7 @@ func TestRepositoryExchangeError(t *testing.T) {
 			func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec("INSERT INTO `devices`").
-					WithArgs(nw.Name, nw.Model, nw.User, nw.CreatedAt). 
+					WithArgs(nw.Name, nw.Model, nw.User, nw.CreatedAt).
 					WillReturnResult(sqlmock.NewResult(int64(nw.ID), 1))
 				mock.ExpectExec("UPDATE `devices`").
 					WithArgs(nw.ID, old.ID).
