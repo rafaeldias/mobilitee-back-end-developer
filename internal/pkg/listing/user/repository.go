@@ -47,7 +47,7 @@ func (r *Repository) LatestExchange(user int) (*Device, error) {
 // Count returns the number of user's active devices.
 func (r *Repository) Count(user int) (int, error) {
 	var total int
-	if err := r.db.Model(Device{}).
+	if err := r.db.Model(&Device{}).
 		Select("count(*)").
 		Where(`"user" = ? AND deleted_at IS NULL`, user).
 		Count(&total).Error; err != nil {
