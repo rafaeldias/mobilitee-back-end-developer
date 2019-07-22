@@ -7,11 +7,11 @@ import (
 
 // Error implements error interface
 type InvalidOperation struct {
-	msg string
+	Msg string
 }
 
 func (e *InvalidOperation) Error() string {
-	return e.msg
+	return e.Msg
 }
 
 // Device is a representation of a device that will

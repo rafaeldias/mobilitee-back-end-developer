@@ -19,8 +19,8 @@ func TestNew(t *testing.T) {
 		t.Errorf(errMsg, "Updater")
 	}
 
-	//if d.Remover == nil {
-	//	t.Errorf(errMsg, "Remover")
-	//}
+	if d.Remover == nil {
+		t.Errorf(errMsg, "Remover")
+	}
 
 }

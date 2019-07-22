@@ -10,7 +10,8 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
-	//"github.com/rafaeldias/mobilitee-back-end-developer/internal/pkg/updating/device"
+	"github.com/rafaeldias/mobilitee-back-end-developer/internal/pkg/removing/device"
+	deviceList "github.com/rafaeldias/mobilitee-back-end-developer/internal/pkg/listing/device"
 )
 
 type removerTest struct {
@@ -22,23 +23,35 @@ func (r *removerTest) DELETE(path string, h httprouter.Handle) {
 }
 
 type deviceRemover struct {
-	id  int
+	dvice  *device.Device
 	err error
 }
 
-func (r *deviceRemover) Remove(id int) error {
-	r.id = id
+func (r *deviceRemover) Remove(d *device.Device) error {
+	r.dvice = d
 	return r.err
 }
 
-func TestRemoveDevices(t *testing.T) {
+func TestRemoveDevice(t *testing.T) {
 	testCases := []struct {
+		dvices	       []*deviceList.Device
 		path           string
 		params         httprouter.Params
 		wantStatusCode int
 	}{
 		{
-			"/devices/:id",
+			[]*deviceList.Device{
+				&deviceList.Device{ID: 1},
+			},
+			"/api/devices/:id",
+			httprouter.Params{
+				httprouter.Param{"id", "1"},
+			},
+			http.StatusNoContent,
+		},
+		{
+			[]*deviceList.Device{},
+			"/api/devices/:id",
 			httprouter.Params{
 				httprouter.Param{"id", "1"},
 			},
@@ -48,9 +61,10 @@ func TestRemoveDevices(t *testing.T) {
 
 	for _, tc := range testCases {
 		remover := &deviceRemover{}
+		reader := &deviceReader{devices: tc.dvices}
 
 		deleter := &removerTest{&routerTest{}}
-		RemoveDevice(deleter, remover)
+		RemoveDevice(deleter, remover, reader)
 
 		rw := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodDelete, tc.path, nil)
@@ -63,8 +77,18 @@ func TestRemoveDevices(t *testing.T) {
 			t.Errorf("got http status code %d, want %d", res.StatusCode, tc.wantStatusCode)
 		}
 
-		if id, _ := strconv.Atoi(tc.params.ByName("id")); remover.id != id {
-			t.Errorf("got id sent to Remove(id, device): %d, want %d", remover.id, id)
+		if id, _ := strconv.Atoi(tc.params.ByName("id")); reader.id != id {
+			t.Errorf("got id sent to Read(id): %d, want %d", reader.id, id)
+		}
+
+		if len(reader.devices) > 0 {
+			if id := reader.devices[0].ID; remover.dvice.ID != id {
+				t.Errorf("got id of remover.Device: %d, want %d", remover.dvice.ID, id)
+			}
+
+			if user := reader.devices[0].User; remover.dvice.User != user {
+				t.Errorf("got id of remover.Device: %d, want %d", remover.dvice.User, user)
+			}
 		}
 	}
 }
@@ -73,15 +97,51 @@ func TestRemoveDeviceError(t *testing.T) {
 	testCases := []struct {
 		path            string
 		params          httprouter.Params
+		reader		*deviceReader
 		remover         *deviceRemover
 		wantError       Err
 		wantStatusCode  int
 		wantContentType string
 	}{
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			httprouter.Params{
 				httprouter.Param{"id", "1"},
+			},
+			&deviceReader{
+				err: errors.New("Reading Error"),
+			},
+			&deviceRemover{},
+			Err{"Reading Error"},
+			http.StatusInternalServerError,
+			"application/json",
+		},
+		{
+			"/api/devices/:id",
+			httprouter.Params{
+				httprouter.Param{"id", "1"},
+			},
+			&deviceReader{
+				devices: []*deviceList.Device{
+					&deviceList.Device{ID: 1},
+				},
+			},
+			&deviceRemover{
+				err: &device.InvalidOperation{"Invalid Op"},
+			},
+			Err{"Invalid Op"},
+			http.StatusBadRequest,
+			"application/json",
+		},
+		{
+			"/api/devices/:id",
+			httprouter.Params{
+				httprouter.Param{"id", "1"},
+			},
+			&deviceReader{
+				devices: []*deviceList.Device{
+					&deviceList.Device{ID: 1},
+				},
 			},
 			&deviceRemover{
 				err: errors.New("Testing Error"),
@@ -91,9 +151,14 @@ func TestRemoveDeviceError(t *testing.T) {
 			"application/json",
 		},
 		{
-			"/devices/:id",
+			"/api/devices/:id",
 			httprouter.Params{
 				httprouter.Param{"id", "xyz"},
+			},
+			&deviceReader{
+				devices: []*deviceList.Device{
+					&deviceList.Device{ID: 1},
+				},
 			},
 			&deviceRemover{},
 			Err{errInvalidID.Error()},
@@ -104,7 +169,7 @@ func TestRemoveDeviceError(t *testing.T) {
 
 	for _, tc := range testCases {
 		deleter := &removerTest{&routerTest{}}
-		RemoveDevice(deleter, tc.remover)
+		RemoveDevice(deleter, tc.remover, tc.reader)
 
 		rw := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPatch, tc.path, nil)

@@ -9,3 +9,4 @@ var errInvalidID = errors.New(`id parameter must be an integer and greater than 
 type Err struct {
 	Error string
 }
+

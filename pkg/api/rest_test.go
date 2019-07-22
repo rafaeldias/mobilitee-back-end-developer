@@ -3,6 +3,7 @@ package api
 import (
 	"testing"
 
+	"github.com/rafaeldias/mobilitee-back-end-developer/pkg/device"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -32,16 +33,16 @@ func (r *routerTest) DELETE(path string, h httprouter.Handle) {
 func TestRestfulDevice(t *testing.T) {
 	rt := &routerTest{}
 
-	RestfulDevice(rt, nil)
+	RestfulDevice(rt, device.New(nil))
 
 	testCases := []struct {
 		method  string
 		invoked bool
 	}{
 		{"GET", rt.getInvoked},
-		//{"POST", rt.postInvoked},
+		{"POST", rt.postInvoked},
 		{"PATCH", rt.patchInvoked},
-		//{"DELETE", rt.deleteInvoked},
+		{"DELETE", rt.deleteInvoked},
 	}
 
 	for _, tc := range testCases {

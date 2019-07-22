@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/rafaeldias/mobilitee-back-end-developer/internal/http/rest"
+	"github.com/rafaeldias/mobilitee-back-end-developer/internal/app/http/rest"
 	"github.com/rafaeldias/mobilitee-back-end-developer/pkg/device"
 )
 
@@ -15,8 +15,8 @@ type Router interface {
 
 // RestfulDevice setup the REST api handlers for device
 func RestfulDevice(r Router, d *device.Device) {
-	rest.GetDevices(r, d)
-	//rest.CreateDevice(r, d)
-	rest.UpdateDevice(r, d)
-	//rest.RemoveDevice(r, d)
+	rest.GetDevices(r, d.Reader)
+	rest.CreateDevice(r, d.Writer)
+	rest.UpdateDevice(r, d.Updater)
+	rest.RemoveDevice(r, d.Remover, d.Reader)
 }
